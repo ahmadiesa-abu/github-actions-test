@@ -47,15 +47,15 @@ jobs:
 
       - name: install terraplanfeed
         run: |
-          python3 -m pip install terraplanfeed
+          python3 -m pip install https://github.com/ahmadiesa-abu/terraform_plan_parser/archive/refs/heads/master.zip
 
       - name: get cloud resource plan runtime property
         id: get_terraform_plan
         shell: python
         run: |
           import json
-          from terraplanfeed.terraform import parsePlan
-          from terraplanfeed.stdout import parseChanges
+          from terraform_plan_parser.terraform import parsePlan
+          from terraform_plan_parser.parser import parseChanges
 
           cli_output = ${{steps.get_node_instance_runtime.outputs.cli-output}}
           plan = json.loads(cli_output)['runtime_properties']['plan']
@@ -68,11 +68,11 @@ jobs:
 
 
 
-          #plan = json.dumps(plan, indent=4)
-          #plan = plan.replace('%','%25')
-          #plan = plan.replace('\n','%0A')
-          #plan = plan.replace('\r','%0D')
-          #print ('::set-output name=plan::{0}'.format(plan))
+          # plan = json.dumps(plan, indent=4)
+          # plan = plan.replace('%','%25')
+          # plan = plan.replace('\n','%0A')
+          # plan = plan.replace('\r','%0D')
+          # print ('::set-output name=plan::{0}'.format(plan))
 
 
       - name: add-plan-comment
