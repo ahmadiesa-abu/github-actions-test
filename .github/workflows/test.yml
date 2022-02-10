@@ -7,12 +7,22 @@ jobs:
     runs-on: ubuntu-latest
     environment: 'test'
     steps:
+      - id: format_comment
+        name: Check if comment starts with cfy and remove it
+        shell: python
+        run: |
+          comment = ${{ github.event.comment.body }}
+          comment = comment.strip()
+          if comment.startswith('cfy'):
+            comment = comment.replace('cfy', '', 1)
+          print ('::set-output name=command::{0}'.format(comment))
+
       - id: execute_command
         name: Execute cloudify command from comment
         if: ${{ github.event.issue.pull_request }}
         uses: ahmadiesa-abu/cli-action@v1.0.1
         with:
-          command: ${{ github.event.comment.body }}
+          command: ${{steps.check_comment.outputs.cli-output}}
 
       - id: format_command
         name: format command output
@@ -24,16 +34,6 @@ jobs:
           cli_output = cli_output.replace('\n','%0A')
           cli_output = cli_output.replace('\r','%0D')
           print ('::set-output name=cli-output::{0}'.format(cli_output))
-
-
-      # - name: Create comment
-      #   # run: echo ${{ steps.execute_command.outputs.cli-output }}
-      #   uses: peter-evans/create-or-update-comment@v1.4.5
-      #   with:
-      #     issue-number: ${{ github.event.issue.number }}
-      #     body: |
-      #       ${{ steps.format_command.outputs.cli-output }}
-
 
       - name: add comment
         id: comment
@@ -51,7 +51,7 @@ jobs:
             ${process.env.COMMENT}
             \`\`\`
             </details>`;
-            
+
             github.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
