@@ -22,6 +22,7 @@ jobs:
           variables-file: terraform/integration.yaml
           outputs-file: env-data.json
           plan: "true"
+
       - name: get cloud resource node instance id
         id: get_instance_id
         uses: ahmadiesa-abu/cli-action@v1.0.1
@@ -112,15 +113,7 @@ jobs:
           module-source-path: template/modules/public_vm
           variables-file: terraform/integration.yaml
           outputs-file: env-data.json
-      - name: Upload environment data
-        uses: actions/upload-artifact@v2
-        with:
-          name: terraform-env-data
-          path: env-data.json
-      - name: Delete environment
-        uses: cloudify-cosmo/delete-environment-action@v1.1
-        with:
-          environment-name: "test-terraform-$GITHUB_RUN_ID"
+
 env:
   DEP_BLUEPRINT_ID: bp-${{ github.run_id }}
   DEP_DEPLOYMENT_ID: dep-${{ github.run_id }}
