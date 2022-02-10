@@ -11,7 +11,7 @@ jobs:
         name: Check if comment starts with cfy and remove it
         shell: python
         run: |
-          comment = ${{ github.event.comment.body }}
+          comment = "${{ github.event.comment.body }}"
           comment = comment.strip()
           if comment.startswith('cfy'):
             comment = comment.replace('cfy', '', 1)
