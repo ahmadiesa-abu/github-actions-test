@@ -26,7 +26,7 @@ jobs:
         id: get_instance_id
         uses: ahmadiesa-abu/cli-action@v1.0.1
         with:
-          command: node-instances list -d "test-terraform-$GITHUB_RUN_ID" -n cloud_resources --json
+          command: node-instances list -d "test-terraform-$GITHUB_RUN_ID" -n terraform_module --json
 
       - id: format_node_list
         name: format command output
