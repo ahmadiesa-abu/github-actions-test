@@ -1,0 +1,158 @@
+name: "Execute Terraform Plan"
+on:
+  # push:
+  #   branches:
+  #     - develop/*
+  pull_request:
+    branches:
+      - terraform/*
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Create environment
+        uses: ahmadiesa-abu/terraform-action@v1.1
+        with:
+          environment-name: "test-terraform-$GITHUB_RUN_ID"
+          module-file: https://github.com/cloudify-community/tf-source/archive/refs/heads/main.zip
+          module-source-path: template/modules/public_vm
+          variables-file: terraform/integration.yaml
+          outputs-file: env-data.json
+          plan: "true"
+      - name: Upload environment data
+        uses: actions/upload-artifact@v2
+        with:
+          name: terraform-env-data
+          path: env-data.json
+      - name: Delete environment
+        uses: cloudify-cosmo/delete-environment-action@v1.1
+        with:
+          environment-name: "test-terraform-$GITHUB_RUN_ID"
+
+
+      # 
+      # - name: Checkout code
+      #   uses: actions/checkout@v2
+      # - name: Upload blueprint
+      #   id: upload-blueprint
+      #   uses: ahmadiesa-abu/cli-action@v1.0.1
+      #   with:
+      #     command: blueprints upload terraform/blueprint.yaml -b $DEP_BLUEPRINT_ID
+      # - name: create deployment
+      #   uses: ahmadiesa-abu/cli-action@v1.0.1
+      #   with:
+      #     command: deployments create  -b $DEP_BLUEPRINT_ID $DEP_DEPLOYMENT_ID
+      # - name: execute install
+      #   uses: ahmadiesa-abu/cli-action@v1.0.1
+      #   with:
+      #     command: executions start install -d $DEP_DEPLOYMENT_ID
+      # - name: get cloud resource node instance id
+      #   id: get_instance_id
+      #   uses: ahmadiesa-abu/cli-action@v1.0.1
+      #   with:
+      #     command: node-instances list -d $DEP_DEPLOYMENT_ID -n cloud_resources --json
+      #
+      # - id: format_node_list
+      #   name: format command output
+      #   shell: python
+      #   run: |
+      #     import json
+      #     cli_output = ${{steps.get_instance_id.outputs.cli-output}}
+      #     instance_id = json.loads(cli_output)[0]['id']
+      #     print ('::set-output name=instance-id::{0}'.format(instance_id))
+      #
+      # - name: get cloud resource instane runtime properties
+      #   id: get_node_instance_runtime
+      #   uses: ahmadiesa-abu/cli-action@v1.0.1
+      #   with:
+      #     command: node-instances get ${{ steps.format_node_list.outputs.instance-id }} --json
+      #
+      # - name: install terraplanfeed
+      #   run: |
+      #     python3 -m pip install https://github.com/ahmadiesa-abu/terraform_plan_parser/archive/refs/heads/master.zip
+      #
+      # - name: get cloud resource plan runtime property
+      #   id: get_terraform_plan
+      #   shell: python
+      #   run: |
+      #     import json
+      #     from terraform_plan_parser.terraform import parsePlan
+      #     from terraform_plan_parser.parser import parseChanges
+      #
+      #     cli_output = ${{steps.get_node_instance_runtime.outputs.cli-output}}
+      #     plan = json.loads(cli_output)['runtime_properties']['plan']
+      #     resources = parsePlan(plan)
+      #     pretty_plan = parseChanges(resources, True)
+      #     pretty_plan = pretty_plan.replace('%','%25')
+      #     pretty_plan = pretty_plan.replace('\n','%0A')
+      #     pretty_plan = pretty_plan.replace('\r','%0D')
+      #     print ('::set-output name=plan::{0}'.format(pretty_plan))
+      #
+      #
+      #
+      #     # plan = json.dumps(plan, indent=4)
+      #     # plan = plan.replace('%','%25')
+      #     # plan = plan.replace('\n','%0A')
+      #     # plan = plan.replace('\r','%0D')
+      #     # print ('::set-output name=plan::{0}'.format(plan))
+      #
+      #
+      # - name: add-plan-comment
+      #   id: comment
+      #   uses: actions/github-script@v3
+      #   if: github.event_name == 'pull_request'
+      #   env:
+      #     PLAN: "terraform\n${{ steps.get_terraform_plan.outputs.plan }}"
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     script: |
+      #       const output = `#### Terraform Plan
+      #
+      #       <details><summary>Show Plan</summary>
+      #
+      #       \`\`\`\n
+      #       ${process.env.PLAN}
+      #       \`\`\`
+      #
+      #       </details>
+      #
+      #       *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+      #
+      #       github.issues.createComment({
+      #         issue_number: context.issue.number,
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         body: output
+      #       })
+      #
+      # - name: uninstall-deployment
+      #   id: uninstall_deployment
+      #   uses: ahmadiesa-abu/cli-action@v1.0.1
+      #   with:
+      #     command: executions start uninstall -d $DEP_DEPLOYMENT_ID
+      #
+      # - name: delete-deployment
+      #   id: delete_deployment
+      #   uses: ahmadiesa-abu/cli-action@v1.0.1
+      #   with:
+      #     command: deployments delete $DEP_DEPLOYMENT_ID
+      #
+      #
+      # - name: delete-blueprint
+      #   id: delete_blueprint
+      #   uses: ahmadiesa-abu/cli-action@v1.0.1
+      #   with:
+      #     command: blueprints delete $DEP_BLUEPRINT_ID
+
+env:
+  DEP_BLUEPRINT_ID: bp-${{ github.run_id }}
+  DEP_DEPLOYMENT_ID: dep-${{ github.run_id }}
+  CLOUDIFY_HOST: ${{ secrets.CLOUDIFY_HOST }}
+  CLOUDIFY_USERNAME: ${{ secrets.CLOUDIFY_USERNAME }}
+  CLOUDIFY_PASSWORD: ${{ secrets.CLOUDIFY_PASSWORD }}
+  CLOUDIFY_TENANT: default_tenant
+  CLOUDIFY_SSL: ${{ secrets.CLOUDIFY_SSL }}
+  CLOUDIFY_SSL_TRUST_ALL: ${{ secrets.CLOUDIFY_SSL_TRUST_ALL }}
