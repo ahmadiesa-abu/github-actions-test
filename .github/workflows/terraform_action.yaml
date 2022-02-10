@@ -5,7 +5,7 @@ on:
   #     - develop/*
   pull_request:
     branches:
-      - terraform/*
+      - master
 
 jobs:
   plan:
