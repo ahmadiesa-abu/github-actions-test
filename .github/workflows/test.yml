@@ -22,7 +22,7 @@ jobs:
         if: ${{ github.event.issue.pull_request }}
         uses: ahmadiesa-abu/cli-action@v1.0.1
         with:
-          command: ${{steps.check_comment.outputs.cli-output}}
+          command: ${{steps.check_comment.outputs.command}}
 
       - id: format_command
         name: format command output
