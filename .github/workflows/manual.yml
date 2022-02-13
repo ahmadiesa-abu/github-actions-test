@@ -8,14 +8,10 @@ on:
   workflow_dispatch:
     # Inputs the workflow accepts.
     inputs:
-      blueprint_id:
-        description: 'Blueprint ID'
+      environment_name: 
+        description: 'environment_name'
         required: true
-        type: choice
-        options:
-          - test1
-          - test2
-          - test3
+        type: string
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -26,25 +22,29 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
     - name: create environment
       uses: ahmadiesa-abu/create-environment-action@v1.2
       with:
-        environment-name: test-from-gh
-        blueprint: ${{ github.event.inputs.blueprint_id }}
+        environment-name: ${{ github.event.inputs.environment_name }}
+        blueprint: blueprint.yaml
         labels: test1:true,test2:false
 
-
-    - name: uninstall-deployment
-      id: uninstall_deployment
-      uses: ahmadiesa-abu/cli-action@v1.0.1
+    - name: get environment data
+      uses: ahmadiesa-abu/environment-data-labels-action@v1.2
       with:
-        command: executions start uninstall -d test-from-gh
+        environment-name: ${{ github.event.inputs.environment_name }}
+        labels: test1:true,test2:false
+        outputs-file: env-data.json
+        
 
-    - name: delete-deployment
-      id: delete_deployment
-      uses: ahmadiesa-abu/cli-action@v1.0.1
+    - name: delete-environment
+      id: delete_environment
+      uses: ahmadiesa-abu/delete-environment-action@v1.2
       with:
-        command: deployments delete test-from-gh
+        environment-name: ${{ github.event.inputs.environment_name }}
+        labels: test1:true,test2:false
 
 env:
   CLOUDIFY_HOST: ${{ secrets.CLOUDIFY_HOST }}
