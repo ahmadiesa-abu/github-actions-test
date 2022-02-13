@@ -26,18 +26,12 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Runs a single command using the runners shell
-    - name: Send greeting
-      run: echo "Hello ${{ github.event.inputs.name }}"
-
-    - name: create deployment
-      uses: ahmadiesa-abu/cli-action@v1.0.1
+    - name: create environment
+      uses: ahmadiesa-abu/create-environment-action@v1.2
       with:
-        command: deployments create  -b ${{ github.event.inputs.blueprint_id }} test-from-gh
-    - name: execute install
-      uses: ahmadiesa-abu/cli-action@v1.0.1
-      with:
-        command: executions start install -d test-from-gh
+        environment-name: test-from-gh
+        blueprint: ${{ github.event.inputs.blueprint_id }}
+        labels: test1:true,test2:false
 
 
     - name: uninstall-deployment
@@ -53,8 +47,6 @@ jobs:
         command: deployments delete test-from-gh
 
 env:
-  DEP_BLUEPRINT_ID: bp-${{ github.run_id }}
-  DEP_DEPLOYMENT_ID: dep-${{ github.run_id }}
   CLOUDIFY_HOST: ${{ secrets.CLOUDIFY_HOST }}
   CLOUDIFY_USERNAME: ${{ secrets.CLOUDIFY_USERNAME }}
   CLOUDIFY_PASSWORD: ${{ secrets.CLOUDIFY_PASSWORD }}
