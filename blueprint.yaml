@@ -1,0 +1,16 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
+
+node_templates:
+
+  test_list:
+    type: cloudify.nodes.Root
+
+
+capabilities:
+  cap1:
+    value: 'testingCap1'
+  cap2:
+    value: 'testingCap1'
