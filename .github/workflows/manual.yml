@@ -37,7 +37,12 @@ jobs:
         environment-name: ${{ github.event.inputs.environment_name }}
         labels: test1:true,test2:false
         outputs-file: env-data.json
-        
+
+    - name: Upload environment data
+      uses: actions/upload-artifact@v2
+      with:
+        name: simple-env-data
+        path: env-data.json
 
     - name: delete-environment
       id: delete_environment
