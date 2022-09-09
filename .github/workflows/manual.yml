@@ -28,32 +28,35 @@ jobs:
       shell: bash
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: create environment
-      uses: ahmadiesa-abu/create-environment-action@v1.2
-      with:
-        environment-name: ${{ github.event.inputs.environment_name }}
-        blueprint: blueprint.yaml
-        labels: test1:true,test2:false
+    - name: do ls again
+      run: |
+         ls -al
+#     - name: create environment
+#       uses: ahmadiesa-abu/create-environment-action@v1.2
+#       with:
+#         environment-name: ${{ github.event.inputs.environment_name }}
+#         blueprint: blueprint.yaml
+#         labels: test1:true,test2:false
 
-    - name: get environment data
-      uses: ahmadiesa-abu/environment-data-labels-action@v1.2
-      with:
-        environment-name: ${{ github.event.inputs.environment_name }}
-        labels: test1:true,test2:false
-        outputs-file: env-data.json
+#     - name: get environment data
+#       uses: ahmadiesa-abu/environment-data-labels-action@v1.2
+#       with:
+#         environment-name: ${{ github.event.inputs.environment_name }}
+#         labels: test1:true,test2:false
+#         outputs-file: env-data.json
 
-    - name: Upload environment data
-      uses: actions/upload-artifact@v2
-      with:
-        name: simple-env-data
-        path: env-data.json
+#     - name: Upload environment data
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: simple-env-data
+#         path: env-data.json
 
-    - name: delete-environment
-      id: delete_environment
-      uses: ahmadiesa-abu/delete-environment-action@v1.2
-      with:
-        environment-name: ${{ github.event.inputs.environment_name }}
-        labels: test1:true,test2:false
+#     - name: delete-environment
+#       id: delete_environment
+#       uses: ahmadiesa-abu/delete-environment-action@v1.2
+#       with:
+#         environment-name: ${{ github.event.inputs.environment_name }}
+#         labels: test1:true,test2:false
 
 env:
   CLOUDIFY_HOST: ${{ secrets.CLOUDIFY_HOST }}
