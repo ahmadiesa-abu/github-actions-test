@@ -22,6 +22,10 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+    - name: do ls
+      run: |
+         ls -al
+      shell: bash
     - name: Checkout code
       uses: actions/checkout@v2
     - name: create environment
